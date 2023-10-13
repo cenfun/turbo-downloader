@@ -8,15 +8,20 @@ const initialize = () => {
     // console.log(css);
     document.head.appendChild(document.createElement('style')).appendChild(document.createTextNode(css));
 
+
+    const $helper = document.createElement('div');
+    $helper.className = 'downloader-helper-container';
+
     const iconDownload = document.createElement('div');
     iconDownload.innerHTML = svgDownload;
+    $helper.appendChild(iconDownload);
 
-    const container = document.createElement('div');
-    container.className = 'downloader-helper-container';
+    const label = document.createElement('span');
+    label.innerHTML = 'save';
+    $helper.appendChild(label);
 
-    container.appendChild(iconDownload);
+    document.body.appendChild($helper);
 
-    document.body.appendChild(container);
 
     document.body.addEventListener('mouseover', (e) => {
 
@@ -26,13 +31,29 @@ const initialize = () => {
             return;
         }
 
+        $target.appendChild($helper);
 
         // console.log($target.classList);
 
-        const br = $target.getBoundingClientRect();
+        // const br = $target.getBoundingClientRect();
 
-        container.style.top = `${br.top}px`;
-        container.style.left = `${br.left}px`;
+        // const t = br.top + 10;
+        // const l = br.left + br.width - 30;
+
+        // container.style.top = `${t}px`;
+        // container.style.left = `${l}px`;
+        // container.style.display = 'block';
+
+        const leaveHandler = (ee) => {
+            $target.removeEventListener('mouseleave', leaveHandler);
+
+            if ($helper.parentNode) {
+                $helper.parentNode.removeChild($helper);
+            }
+
+        };
+
+        $target.addEventListener('mouseleave', leaveHandler);
 
     });
 
