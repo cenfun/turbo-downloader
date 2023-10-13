@@ -1,7 +1,55 @@
+import { saveAs } from 'file-saver';
 
 import css from './style.scss';
 
 import svgDownload from './images/download.svg';
+
+// global element
+let $helper;
+let $target;
+
+const mouseleaveHandler = (e) => {
+
+    $target.removeEventListener('mouseleave', mouseleaveHandler);
+    $target = null;
+
+    if ($helper.parentNode) {
+        $helper.parentNode.removeChild($helper);
+    }
+
+};
+
+const showHelper = (target) => {
+    $target = target;
+    $target.appendChild($helper);
+    $target.addEventListener('mouseleave', mouseleaveHandler);
+};
+
+const saveImage = () => {
+    if (!$target) {
+        return;
+    }
+
+    const bgi = $target.style.backgroundImage;
+    console.log(bgi);
+
+    const url = bgi.split('("')[1].split('")')[0];
+    console.log('save image', url);
+    // http://sns-webpic-qc.xhscdn.com/202310131211/abde3ef35468fc78c30c433a1dcf8746/1040g00830pus52mf6i6g5p86vgr0houid08a1ug!nd_whlt34_webp_wm_1
+
+    const id = url.split('/').pop().split('!')[0];
+    console.log('id', id);
+
+    const $author = document.querySelector('.author-container');
+    const href = $author.querySelector('a').href;
+    const user = href.split('/').pop();
+    console.log('user', user);
+
+    const filename = `${user}-${id}`;
+
+    saveAs(url, filename);
+
+};
 
 const initialize = () => {
 
@@ -9,7 +57,8 @@ const initialize = () => {
     document.head.appendChild(document.createElement('style')).appendChild(document.createTextNode(css));
 
 
-    const $helper = document.createElement('div');
+    // init helper
+    $helper = document.createElement('div');
     $helper.className = 'downloader-helper-container';
 
     const iconDownload = document.createElement('div');
@@ -20,40 +69,22 @@ const initialize = () => {
     label.innerHTML = 'save';
     $helper.appendChild(label);
 
+    $helper.addEventListener('click', (e) => {
+        e.stopPropagation();
+        saveImage();
+    });
+
     document.body.appendChild($helper);
 
+    // init events
+    document.addEventListener('mouseover', (e) => {
 
-    document.body.addEventListener('mouseover', (e) => {
-
-        const $target = e.target;
-
-        if (!$target.classList.contains('swiper-slide')) {
+        const target = e.target;
+        if (!target.classList.contains('swiper-slide')) {
             return;
         }
 
-        $target.appendChild($helper);
-
-        // console.log($target.classList);
-
-        // const br = $target.getBoundingClientRect();
-
-        // const t = br.top + 10;
-        // const l = br.left + br.width - 30;
-
-        // container.style.top = `${t}px`;
-        // container.style.left = `${l}px`;
-        // container.style.display = 'block';
-
-        const leaveHandler = (ee) => {
-            $target.removeEventListener('mouseleave', leaveHandler);
-
-            if ($helper.parentNode) {
-                $helper.parentNode.removeChild($helper);
-            }
-
-        };
-
-        $target.addEventListener('mouseleave', leaveHandler);
+        showHelper(target);
 
     });
 
