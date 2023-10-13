@@ -7,6 +7,7 @@ import svgDownload from './images/download.svg';
 // global element
 let $helper;
 let $target;
+let currentType;
 
 const mouseleaveHandler = (e) => {
 
@@ -19,35 +20,72 @@ const mouseleaveHandler = (e) => {
 
 };
 
-const showHelper = (target) => {
+const showHelper = (target, type) => {
     $target = target;
+    currentType = type;
     $target.appendChild($helper);
     $target.addEventListener('mouseleave', mouseleaveHandler);
 };
 
-const saveImage = () => {
-    if (!$target) {
-        return;
-    }
+const getUserId = () => {
+    const $author = document.querySelector('.author-container');
+    const href = $author.querySelector('a').href;
+    const user = href.split('/').pop();
+    return user;
+};
 
+const saveImage = () => {
     const bgi = $target.style.backgroundImage;
     console.log(bgi);
 
     const url = bgi.split('("')[1].split('")')[0];
-    console.log('save image', url);
+    console.log('image url', url);
     // http://sns-webpic-qc.xhscdn.com/202310131211/abde3ef35468fc78c30c433a1dcf8746/1040g00830pus52mf6i6g5p86vgr0houid08a1ug!nd_whlt34_webp_wm_1
 
     const id = url.split('/').pop().split('!')[0];
     console.log('id', id);
 
-    const $author = document.querySelector('.author-container');
-    const href = $author.querySelector('a').href;
-    const user = href.split('/').pop();
+    const user = getUserId();
     console.log('user', user);
 
     const filename = `${user}-${id}`;
 
     saveAs(url, filename);
+};
+
+const saveVideo = () => {
+    const $video = $target.parentNode.querySelector('video');
+    const url = $video.src;
+    console.log('video url', url);
+
+    const id = url.split('/').pop();
+    console.log('id', id);
+
+    const user = getUserId();
+    console.log('user', user);
+
+    const filename = `${user}-${id}`;
+
+    saveAs(url, filename);
+
+};
+
+
+const saveHandler = (e) => {
+
+    if (!$target) {
+        return;
+    }
+
+    e.stopPropagation();
+
+    if (currentType === 'image') {
+        saveImage();
+        return;
+    }
+
+    saveVideo();
+
 
 };
 
@@ -69,10 +107,7 @@ const initialize = () => {
     label.innerHTML = 'save';
     $helper.appendChild(label);
 
-    $helper.addEventListener('click', (e) => {
-        e.stopPropagation();
-        saveImage();
-    });
+    $helper.addEventListener('click', saveHandler);
 
     document.body.appendChild($helper);
 
@@ -80,11 +115,18 @@ const initialize = () => {
     document.addEventListener('mouseover', (e) => {
 
         const target = e.target;
-        if (!target.classList.contains('swiper-slide')) {
+        const cls = target.classList;
+        // console.log(cls);
+
+        if (cls.contains('swiper-slide')) {
+            showHelper(target, 'image');
             return;
         }
 
-        showHelper(target);
+        if (cls.contains('xgplayer-poster')) {
+            showHelper(target, 'video');
+        }
+
 
     });
 
