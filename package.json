@@ -1,0 +1,24 @@
+{
+    "name": "xhs-downloader",
+    "version": "1.0.0",
+    "description": "",
+    "type": "module",
+    "main": "lib/index.js",
+    "scripts": {
+        "build": "node ./lib/build.js",
+        "start": "npm run build && node ./"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "chrome-launcher": "^1.1.0",
+        "eight-colors": "^1.0.3",
+        "esbuild": "^0.19.4",
+        "esbuild-sass-plugin": "^2.16.0",
+        "playwright": "^1.39.0"
+    },
+    "devDependencies": {
+        "eslint": "^8.51.0",
+        "eslint-config-plus": "^1.0.6",
+        "eslint-plugin-html": "^7.1.0"
+    }
+}
