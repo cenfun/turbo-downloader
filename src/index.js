@@ -58,7 +58,7 @@ const saveVideo = () => {
     const url = $video.src;
     console.log('video url', url);
 
-    const id = url.split('/').pop();
+    const id = url.split('?')[0].split('/').pop();
     console.log('id', id);
 
     const user = getUserId();
