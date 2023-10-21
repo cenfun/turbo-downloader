@@ -61,30 +61,52 @@ const getDownloadType = (target) => {
     }
 };
 
+let downloadTarget;
+let downloadType;
+
 export default {
     id: 'xiaohongshu',
     name: '小红书',
     url: 'https://www.xiaohongshu.com/',
 
-    bindEvents: (showHelper) => {
+    bindEvents: (showHelper, hideHelper) => {
 
         document.addEventListener('mouseover', (e) => {
             const target = e.target;
             const type = getDownloadType(target);
-            if (type) {
-                showHelper(target, type);
+            if (!type) {
+                return;
             }
+
+            downloadTarget = target;
+            downloadType = type;
+
+            showHelper(downloadTarget);
+
+            const mouseleaveHandler = () => {
+                if (downloadTarget) {
+                    downloadTarget.removeEventListener('mouseleave', mouseleaveHandler);
+                }
+                downloadTarget = null;
+                hideHelper();
+            };
+
+            downloadTarget.addEventListener('mouseleave', mouseleaveHandler);
+
         });
 
     },
 
-    getDownloadInfo: (target, type) => {
-        if (type === 'image') {
-            return getImageInfo(target);
+    getDownloadInfo: () => {
+        if (!downloadTarget) {
+            return;
+        }
+        if (downloadType === 'image') {
+            return getImageInfo(downloadTarget);
         }
 
-        if (type === 'video') {
-            return getVideoInfo(target);
+        if (downloadType === 'video') {
+            return getVideoInfo(downloadTarget);
         }
     }
 };

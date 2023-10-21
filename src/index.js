@@ -14,11 +14,10 @@ const list = [
 
 // global element
 let downloadHelper;
-let downloadTarget;
-let downloadType;
 
 let mySocket;
 
+// https://developer.mozilla.org/en-US/docs/Web/API/WebSocket
 const sendMessage = (action, data) => {
     if (mySocket) {
         mySocket.send(JSON.stringify({
@@ -45,38 +44,26 @@ const initSocket = () => {
     });
 };
 
-const mouseleaveHandler = (e) => {
+const showHelper = (target) => {
+    target.appendChild(downloadHelper);
+};
 
-    downloadTarget.removeEventListener('mouseleave', mouseleaveHandler);
-    downloadTarget = null;
-
+const hideHelper = () => {
     if (downloadHelper.parentNode) {
         downloadHelper.parentNode.removeChild(downloadHelper);
     }
-
-};
-
-const showHelper = (target, type) => {
-    downloadTarget = target;
-    downloadType = type;
-    downloadTarget.appendChild(downloadHelper);
-    downloadTarget.addEventListener('mouseleave', mouseleaveHandler);
 };
 
 const bindEvents = (item) => {
     // init events
 
-    item.bindEvents(showHelper);
+    item.bindEvents(showHelper, hideHelper);
 
     downloadHelper.addEventListener('click', (e) => {
 
-        if (!downloadTarget) {
-            return;
-        }
-
         e.stopPropagation();
 
-        const info = item.getDownloadInfo(downloadTarget, downloadType);
+        const info = item.getDownloadInfo();
         if (info) {
             saveAs(info.url, info.filename);
         }
