@@ -32,3 +32,19 @@
 .downloader-helper-container:hover {
     opacity: 1;
 }
+
+.downloader-list {
+    li {
+        padding: 10px 10px;
+    }
+
+    a:visited,
+    a:link {
+        color: #333;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+}

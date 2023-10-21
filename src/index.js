@@ -4,89 +4,109 @@ import css from './style.scss';
 
 import svgDownload from './images/download.svg';
 
+import XHS from './xhs.js';
+import INS from './ins.js';
+
+const list = [
+    XHS,
+    INS
+];
+
 // global element
-let $helper;
-let $target;
-let currentType;
+let downloadHelper;
+let downloadTarget;
+let downloadType;
+
+let mySocket;
+
+const sendMessage = (action, data) => {
+    if (mySocket) {
+        mySocket.send(JSON.stringify({
+            action,
+            data
+        }));
+    }
+};
+
+const initSocket = () => {
+    const socket = new WebSocket('ws://localhost:8899');
+
+    // Connection opened
+    socket.addEventListener('open', (event) => {
+
+        mySocket = socket;
+        sendMessage('init', 'Connection opened');
+
+    });
+
+    // Listen for messages
+    socket.addEventListener('message', (event) => {
+        console.log('Message from server ', event.data);
+    });
+};
 
 const mouseleaveHandler = (e) => {
 
-    $target.removeEventListener('mouseleave', mouseleaveHandler);
-    $target = null;
+    downloadTarget.removeEventListener('mouseleave', mouseleaveHandler);
+    downloadTarget = null;
 
-    if ($helper.parentNode) {
-        $helper.parentNode.removeChild($helper);
+    if (downloadHelper.parentNode) {
+        downloadHelper.parentNode.removeChild(downloadHelper);
     }
 
 };
 
 const showHelper = (target, type) => {
-    $target = target;
-    currentType = type;
-    $target.appendChild($helper);
-    $target.addEventListener('mouseleave', mouseleaveHandler);
+    downloadTarget = target;
+    downloadType = type;
+    downloadTarget.appendChild(downloadHelper);
+    downloadTarget.addEventListener('mouseleave', mouseleaveHandler);
 };
 
-const getUserId = () => {
-    const $author = document.querySelector('.author-container');
-    const href = $author.querySelector('a').href;
-    const user = href.split('/').pop();
-    return user;
-};
+const bindEvents = (item) => {
+    // init events
 
-const saveImage = () => {
-    const bgi = $target.style.backgroundImage;
-    console.log(bgi);
+    item.bindEvents(showHelper);
 
-    const url = bgi.split('("')[1].split('")')[0];
-    console.log('image url', url);
-    // http://sns-webpic-qc.xhscdn.com/202310131211/abde3ef35468fc78c30c433a1dcf8746/1040g00830pus52mf6i6g5p86vgr0houid08a1ug!nd_whlt34_webp_wm_1
+    downloadHelper.addEventListener('click', (e) => {
 
-    const id = url.split('/').pop().split('!')[0];
-    console.log('id', id);
+        if (!downloadTarget) {
+            return;
+        }
 
-    const user = getUserId();
-    console.log('user', user);
+        e.stopPropagation();
 
-    const filename = `${user}-${id}`;
+        const info = item.getDownloadInfo(downloadTarget, downloadType);
+        if (info) {
+            saveAs(info.url, info.filename);
+        }
 
-    saveAs(url, filename);
-};
-
-const saveVideo = () => {
-    const $video = $target.parentNode.querySelector('video');
-    const url = $video.src;
-    console.log('video url', url);
-
-    const id = url.split('?')[0].split('/').pop();
-    console.log('id', id);
-
-    const user = getUserId();
-    console.log('user', user);
-
-    const filename = `${user}-${id}`;
-
-    saveAs(url, filename);
+    });
 
 };
 
 
-const saveHandler = (e) => {
+const showList = () => {
+    // show list
 
-    if (!$target) {
-        return;
-    }
+    const title = 'Turbo Downloader';
 
-    e.stopPropagation();
+    document.title = title;
 
-    if (currentType === 'image') {
-        saveImage();
-        return;
-    }
+    const html = [];
 
-    saveVideo();
+    html.push(`<h3>${title}</h3>`);
 
+    html.push('<ul class="downloader-list">');
+    list.forEach((item) => {
 
+        html.push(`<li><a href="${item.url}" target="_blank">${item.name} - ${item.url}</a></li>`);
+
+    });
+
+    html.push('</ul>');
+
+    document.body.innerHTML = html.join('');
 };
 
 const initialize = () => {
@@ -96,39 +116,29 @@ const initialize = () => {
 
 
     // init helper
-    $helper = document.createElement('div');
-    $helper.className = 'downloader-helper-container';
+    downloadHelper = document.createElement('div');
+    downloadHelper.className = 'downloader-helper-container';
 
     const iconDownload = document.createElement('div');
     iconDownload.innerHTML = svgDownload;
-    $helper.appendChild(iconDownload);
+    downloadHelper.appendChild(iconDownload);
 
     const label = document.createElement('span');
     label.innerHTML = 'save';
-    $helper.appendChild(label);
+    downloadHelper.appendChild(label);
 
-    $helper.addEventListener('click', saveHandler);
+    initSocket();
 
-    document.body.appendChild($helper);
+    const host = window.location.host;
 
-    // init events
-    document.addEventListener('mouseover', (e) => {
+    const item = list.find((it) => host.indexOf(it.id) !== -1);
 
-        const target = e.target;
-        const cls = target.classList;
-        // console.log(cls);
+    if (item) {
+        bindEvents(item);
+        return;
+    }
 
-        if (cls.contains('swiper-slide')) {
-            showHelper(target, 'image');
-            return;
-        }
-
-        if (cls.contains('xgplayer-poster')) {
-            showHelper(target, 'video');
-        }
-
-
-    });
+    showList();
 
 };
 

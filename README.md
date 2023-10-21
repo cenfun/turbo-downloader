@@ -1,5 +1,7 @@
-# xhs-downloader
-小红书下载器
+# turbo-downloader
+
+- Xiaohongshu
+- Instagram
 
 ## Usage
 ```hash
