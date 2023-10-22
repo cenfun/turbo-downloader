@@ -14,6 +14,7 @@
         "eight-colors": "^1.0.3",
         "esbuild": "^0.19.4",
         "esbuild-sass-plugin": "^2.16.0",
+        "open": "^9.1.0",
         "playwright": "^1.39.0",
         "ws": "^8.14.2"
     },

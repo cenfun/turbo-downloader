@@ -82,9 +82,9 @@ const showList = () => {
 
     const html = [];
 
-    html.push(`<h3>${title}</h3>`);
+    html.push(`<h3>${title} <button class="td-open-folder">Open download folder</button></h3>`);
 
-    html.push('<ul class="downloader-list">');
+    html.push('<ul class="td-downloader-list">');
     list.forEach((item) => {
 
         html.push(`<li><a href="${item.url}" target="_blank">${item.name} - ${item.url}</a></li>`);
@@ -92,6 +92,7 @@ const showList = () => {
     });
 
     html.push('</ul>');
+
 
     document.body.innerHTML = html.join('');
 };
@@ -101,10 +102,16 @@ const initialize = () => {
     // console.log(css);
     document.head.appendChild(document.createElement('style')).appendChild(document.createTextNode(css));
 
+    document.addEventListener('click', (e) => {
+        if (e.target.className === 'td-open-folder') {
+            sendMessage('open-folder');
+        }
+    });
+
 
     // init helper
     downloadHelper = document.createElement('div');
-    downloadHelper.className = 'downloader-helper-container';
+    downloadHelper.className = 'td-downloader-helper';
 
     const iconDownload = document.createElement('div');
     iconDownload.innerHTML = svgDownload;

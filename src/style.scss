@@ -1,4 +1,4 @@
-.downloader-helper-container {
+.td-downloader-helper {
     cursor: pointer;
     display: flex;
     gap: 5px;
@@ -29,11 +29,11 @@
     }
 }
 
-.downloader-helper-container:hover {
+.td-downloader-helper:hover {
     opacity: 1;
 }
 
-.downloader-list {
+.td-downloader-list {
     li {
         padding: 10px 10px;
     }
@@ -47,4 +47,9 @@
     a:hover {
         text-decoration: underline;
     }
+}
+
+
+.td-open-folder {
+    cursor: pointer;
 }
