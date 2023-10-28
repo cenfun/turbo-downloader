@@ -1,3 +1,4 @@
+import { showMessage } from './message.js';
 
 const getArticleTarget = (target) => {
 
@@ -15,6 +16,7 @@ const getArticleTarget = (target) => {
 const getItemInfo = (user, container) => {
     const img = container.querySelector('img');
     if (!img) {
+        showMessage('Not found img');
         return;
     }
 
@@ -66,6 +68,7 @@ const getListInfo = (user, presentation) => {
         return getItemInfo(user, list[1]);
     }
 
+    showMessage('Not found presentation list');
 };
 
 // item in home page list
@@ -73,7 +76,7 @@ const getHomeInfo = (downloadArticle) => {
     const head = downloadArticle.firstChild.childNodes[0];
     const a = head.querySelector('a');
     if (!a) {
-        console.log('Not found id');
+        showMessage('Not found user');
         return;
     }
     const pathname = new URL(a.href).pathname;
@@ -84,6 +87,7 @@ const getHomeInfo = (downloadArticle) => {
 
     const button = body.querySelector("[role='button']");
     if (!button) {
+        showMessage('Not found button');
         return;
     }
 
@@ -102,7 +106,7 @@ const getPopupInfo = (downloadArticle) => {
     const right = downloadArticle.firstChild.childNodes[1];
     const a = right.querySelector('header a');
     if (!a) {
-        console.log('Not found id');
+        showMessage('Not found user');
         return;
     }
     const pathname = new URL(a.href).pathname;
@@ -121,6 +125,7 @@ const getPopupInfo = (downloadArticle) => {
         return getListInfo(user, presentation);
     }
 
+    showMessage('Not found button and presentation');
 
 };
 
