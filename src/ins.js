@@ -13,7 +13,20 @@ const getArticleTarget = (target) => {
 
 };
 
-const getItemInfo = (user, container) => {
+const getVideoInfo = (options, video) => {
+
+    console.log('video', options);
+
+};
+
+const getItemInfo = (options, container) => {
+
+    const video = container.querySelector('video');
+    if (video) {
+        return getVideoInfo(options, video);
+    }
+
+
     const img = container.querySelector('img');
     if (!img) {
         showMessage('Not found img');
@@ -37,7 +50,7 @@ const getItemInfo = (user, container) => {
 
     const id = url.split('?')[0].split('/').pop();
 
-    const filename = `${user}-${id}`;
+    const filename = `${options.user}-${id}`;
 
     return {
         url,
@@ -46,42 +59,85 @@ const getItemInfo = (user, container) => {
 };
 
 
-const getListInfo = (user, presentation) => {
+const getListInfo = (options, container, list) => {
 
-    const list = presentation.querySelectorAll('ul li');
+    // console.log('list length', list.length);
+    const containerX = container.getBoundingClientRect().x;
+    // console.log('containerX', containerX);
 
-    console.log('list length', list.length);
+    const item = list.find((li) => {
+        const itemX = li.getBoundingClientRect().x;
+        // console.log('itemX', itemX);
+        return itemX === containerX;
+    });
 
-    if (list.length === 4) {
-        return getItemInfo(user, list[2]);
+    // console.log(item);
+
+    if (item) {
+        return getItemInfo(options, item);
     }
 
-    if (list.length === 3) {
+    showMessage('Not found presentation list item');
+};
 
-        const containerX = presentation.getBoundingClientRect().x;
-        const itemX = list[1].getBoundingClientRect().x;
+const getOptions = (container) => {
+    const aList = Array.from(container.querySelectorAll('a'));
+    if (!aList.length) {
+        showMessage('Not found a list for options');
+        return;
+    }
 
-        if (itemX < containerX) {
-            return getItemInfo(user, list[2]);
+    let userLink;
+    let pageLink;
+    aList.forEach((a) => {
+
+        const href = a.href;
+        // console.log('href', href);
+
+        if (!href) {
+            return;
         }
 
-        return getItemInfo(user, list[1]);
+        if (href.startsWith('https://www.instagram.com/p/')) {
+            if (!pageLink) {
+                pageLink = href;
+            }
+            return;
+        }
+
+        if (!userLink) {
+            userLink = href;
+        }
+
+    });
+
+    if (!userLink || !pageLink) {
+        showMessage('Not found user or page link', userLink, pageLink);
+        return;
     }
 
-    showMessage('Not found presentation list');
+    const user = new URL(userLink).pathname.split('/')[1];
+    console.log('user', user);
+
+    const pageId = new URL(pageLink).pathname.split('/')[2];
+    console.log('pageId', pageId);
+
+    const options = {
+        user,
+        pageId
+    };
+
+    return options;
 };
 
 // item in home page list
 const getHomeInfo = (downloadArticle) => {
-    const head = downloadArticle.firstChild.childNodes[0];
-    const a = head.querySelector('a');
-    if (!a) {
-        showMessage('Not found user');
+    const head = downloadArticle.lastChild.childNodes[0];
+
+    const options = getOptions(head);
+    if (!options) {
         return;
     }
-    const pathname = new URL(a.href).pathname;
-    const user = pathname.split('/')[1];
-    console.log('user', user);
 
     const body = downloadArticle.firstChild.childNodes[1];
 
@@ -91,12 +147,13 @@ const getHomeInfo = (downloadArticle) => {
         return;
     }
 
-    const presentation = button.querySelector("[role='presentation']");
-    if (presentation) {
-        return getListInfo(user, presentation);
+    const list = Array.from(button.querySelectorAll('ul li'));
+    if (list.length) {
+        const presentation = button.querySelector("[role='presentation']");
+        return getListInfo(options, presentation, list);
     }
 
-    return getItemInfo(user, button);
+    return getItemInfo(options, button);
 };
 
 
@@ -104,26 +161,30 @@ const getHomeInfo = (downloadArticle) => {
 const getPopupInfo = (downloadArticle) => {
 
     const right = downloadArticle.firstChild.childNodes[1];
-    const a = right.querySelector('header a');
-    if (!a) {
-        showMessage('Not found user');
+
+    const options = getOptions(right);
+    if (!options) {
         return;
     }
-    const pathname = new URL(a.href).pathname;
-    const user = pathname.split('/')[1];
-    console.log('user', user);
 
     const left = downloadArticle.firstChild.childNodes[0];
 
-    const button = left.querySelector("[role='button']");
-    if (button) {
-        return getItemInfo(user, button);
+    const list = Array.from(left.querySelectorAll('ul li'));
+    if (list.length) {
+        const presentation = left.querySelector("[role='presentation']");
+        return getListInfo(options, presentation, list);
     }
 
-    const presentation = left.querySelector("[role='presentation']");
-    if (presentation) {
-        return getListInfo(user, presentation);
+    const video = left.querySelector('video');
+    if (video) {
+        return getVideoInfo(options, video);
     }
+
+    const button = left.querySelector("[role='button']");
+    if (button) {
+        return getItemInfo(options, button);
+    }
+
 
     showMessage('Not found button and presentation');
 
