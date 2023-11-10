@@ -57,7 +57,9 @@ const showList = () => {
 
     const html = [];
 
-    html.push(`<h3>${title} <button class="td-open-folder">Open download folder</button></h3>`);
+    html.push(`<h3><a href="https://github.com/cenfun/turbo-downloader" target="_blank">${title}</a></h3>`);
+
+    html.push('<p><button class="td-open-folder">Open download folder</button></p>');
 
     html.push('<ul class="td-downloader-list">');
     list.forEach((item) => {
