@@ -59,7 +59,9 @@ const getItemInfo = (options, container) => {
 };
 
 
-const getListInfo = (options, container, list) => {
+const getListInfo = (options, list) => {
+
+    const container = list[0].parentNode.parentNode.parentNode;
 
     // console.log('list length', list.length);
     const containerX = container.getBoundingClientRect().x;
@@ -112,7 +114,7 @@ const getOptions = (container) => {
     });
 
     if (!userLink || !pageLink) {
-        showMessage('Not found user or page link', userLink, pageLink);
+        showMessage('Not found user or page link');
         return;
     }
 
@@ -149,8 +151,7 @@ const getHomeInfo = (downloadArticle) => {
 
     const list = Array.from(button.querySelectorAll('ul li'));
     if (list.length) {
-        const presentation = button.querySelector("[role='presentation']");
-        return getListInfo(options, presentation, list);
+        return getListInfo(options, list);
     }
 
     return getItemInfo(options, button);
@@ -171,8 +172,7 @@ const getPopupInfo = (downloadArticle) => {
 
     const list = Array.from(left.querySelectorAll('ul li'));
     if (list.length) {
-        const presentation = left.querySelector("[role='presentation']");
-        return getListInfo(options, presentation, list);
+        return getListInfo(options, list);
     }
 
     const video = left.querySelector('video');
