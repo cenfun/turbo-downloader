@@ -38,7 +38,9 @@ const bindEvents = (item) => {
 
         const info = await item.getDownloadInfo();
         if (info) {
+            showMessage('Saving ...');
             saveAs(info.url, info.filename);
+            showMessage('Saved');
         }
 
     });

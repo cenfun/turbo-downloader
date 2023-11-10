@@ -14,17 +14,45 @@ const getArticleTarget = (target) => {
 
 };
 
-const getVideoInfo = async (options, video) => {
+const getVideoItemInfo = (options, info) => {
+    const item = info.video_versions[0];
+    const url = item.url;
+
+    const id = url.split('?')[0].split('/').pop();
+    const filename = `${options.user}-${id}`;
+
+    return {
+        url,
+        filename
+    };
+};
+
+const getVideoInfo = async (options) => {
 
     const { code } = options;
 
-    const videoInfo = await request('get-ins-data', options);
-    if (!videoInfo) {
+    const info = await request('get-ins-data', options);
+    if (!info) {
         showMessage(`Not found video info: ${code}`);
         return;
     }
 
-    console.log(videoInfo.video_versions, videoInfo.carousel_media);
+    // const id = info.id;
+    // console.log(info);
+
+    // single video
+    if (info.video_versions) {
+        return getVideoItemInfo(options, info);
+    }
+
+    // list video
+    if (info.carousel_media) {
+        const itemInfo = info.carousel_media[options.index];
+        return getVideoItemInfo(options, itemInfo);
+    }
+
+    showMessage('Not found video info');
+
 
 };
 
@@ -32,7 +60,7 @@ const getItemInfo = (options, container) => {
 
     const video = container.querySelector('video');
     if (video) {
-        return getVideoInfo(options, video);
+        return getVideoInfo(options);
     }
 
 
@@ -74,7 +102,9 @@ const getListInfo = (options, list) => {
     const container = list[0].parentNode.parentNode.parentNode;
 
     // console.log('list length', list.length);
-    const containerX = container.getBoundingClientRect().x;
+    const rect = container.getBoundingClientRect();
+    const containerX = rect.x;
+
     // console.log('containerX', containerX);
 
     const item = list.find((li) => {
@@ -86,6 +116,21 @@ const getListInfo = (options, list) => {
     // console.log(item);
 
     if (item) {
+
+        const transform = item.style.transform;
+        // transform: translateX(0px);
+        if (transform) {
+            const ls = transform.match(/\d+px/g);
+            if (ls) {
+                const px = ls[0];
+                if (px) {
+                    options.index = parseInt(px) / rect.width;
+                    // console.log(options);
+                }
+            }
+        }
+
+
         return getItemInfo(options, item);
     }
 
