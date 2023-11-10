@@ -1,4 +1,5 @@
 import { showMessage } from './message.js';
+import { request } from './socket.js';
 
 const getArticleTarget = (target) => {
 
@@ -13,9 +14,17 @@ const getArticleTarget = (target) => {
 
 };
 
-const getVideoInfo = (options, video) => {
+const getVideoInfo = async (options, video) => {
 
-    console.log('video', options);
+    const { code } = options;
+
+    const videoInfo = await request('get-ins-data', options);
+    if (!videoInfo) {
+        showMessage(`Not found video info: ${code}`);
+        return;
+    }
+
+    console.log(videoInfo.video_versions, videoInfo.carousel_media);
 
 };
 
@@ -30,6 +39,7 @@ const getItemInfo = (options, container) => {
     const img = container.querySelector('img');
     if (!img) {
         showMessage('Not found img');
+        console.log(container);
         return;
     }
 
@@ -121,12 +131,12 @@ const getOptions = (container) => {
     const user = new URL(userLink).pathname.split('/')[1];
     console.log('user', user);
 
-    const pageId = new URL(pageLink).pathname.split('/')[2];
-    console.log('pageId', pageId);
+    const code = new URL(pageLink).pathname.split('/')[2];
+    console.log('code', code);
 
     const options = {
         user,
-        pageId
+        code
     };
 
     return options;
@@ -191,6 +201,34 @@ const getPopupInfo = (downloadArticle) => {
 };
 
 
+const onLoad = async () => {
+    const scripts = Array.from(document.querySelectorAll('script[type="application/json"]'));
+
+    const contents = scripts.map((it) => it.textContent);
+
+    const feedContent = contents.find((it) => it.indexOf('xdt_api__v1__feed__timeline__connection') !== -1);
+
+    if (!feedContent) {
+        console.log('ERROR: not found feed info');
+        return;
+    }
+
+    const startStr = '"edges":';
+    const startIndex = feedContent.indexOf(startStr);
+    const endIndex = feedContent.indexOf(',"page_info"');
+
+    const edges = feedContent.slice(startIndex + startStr.length, endIndex);
+    //  console.log(edges);
+
+    const list = JSON.parse(edges).map((it) => it.node.media).filter((it) => it);
+
+    // console.log('feed list', list);
+
+    await request('set-ins-list', list);
+    // console.log(res);
+};
+
+
 let downloadArticle;
 let downloadTarget;
 
@@ -200,6 +238,8 @@ export default {
     url: 'https://www.instagram.com/',
 
     bindEvents: (showHelper, hideHelper) => {
+
+        onLoad();
 
         document.addEventListener('mouseover', (e) => {
             const target = e.target;
