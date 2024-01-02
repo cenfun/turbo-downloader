@@ -76,6 +76,19 @@ const showList = () => {
 
 const initialize = () => {
 
+    const host = window.location.host;
+    console.log(host);
+    const isLocalhost = host === 'localhost:8900';
+    const item = list.find((it) => host.indexOf(it.id) !== -1);
+
+    console.log(isLocalhost, item);
+
+    if (!isLocalhost && !item) {
+        return;
+    }
+
+    //  console.log(host);
+
     // console.log(css);
     document.head.appendChild(document.createElement('style')).appendChild(document.createTextNode(css));
 
@@ -100,16 +113,12 @@ const initialize = () => {
 
     initSocket();
 
-    const host = window.location.host;
-
-    const item = list.find((it) => host.indexOf(it.id) !== -1);
-
-    if (item) {
-        bindEvents(item);
+    if (isLocalhost) {
+        showList();
         return;
     }
 
-    showList();
+    bindEvents(item);
 
 };
 
