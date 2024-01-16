@@ -10,12 +10,12 @@
     },
     "license": "MIT",
     "dependencies": {
-        "eight-colors": "^1.0.3",
+        "eight-colors": "^1.2.1",
         "esbuild": "^0.19.11",
         "esbuild-sass-plugin": "^2.16.1",
         "koa": "^2.15.0",
-        "koa-static-resolver": "^1.0.4",
-        "open": "^10.0.2",
+        "koa-static-resolver": "^1.0.5",
+        "open": "^10.0.3",
         "playwright": "^1.40.1",
         "ws": "^8.16.0"
     },
