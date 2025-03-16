@@ -12,17 +12,17 @@
     "license": "MIT",
     "dependencies": {
         "eight-colors": "^1.3.1",
-        "esbuild": "^0.24.2",
+        "esbuild": "^0.25.1",
         "esbuild-sass-plugin": "^3.3.1",
-        "koa": "^2.15.3",
+        "koa": "^2.16.0",
         "koa-static-resolver": "^1.0.6",
         "mouse-helper": "^1.0.7",
         "open": "^10.1.0",
-        "playwright": "^1.50.0",
-        "ws": "^8.18.0"
+        "playwright": "^1.51.0",
+        "ws": "^8.18.1"
     },
     "devDependencies": {
-        "eslint": "^9.19.0",
+        "eslint": "^9.22.0",
         "eslint-config-plus": "^2.0.2",
         "eslint-plugin-html": "^8.1.2",
         "file-saver": "^2.0.5"
