@@ -4,13 +4,11 @@ import css from './style.scss';
 
 import svgDownload from './images/download.svg';
 
-import XHS from './xhs.js';
 import INS from './ins.js';
 import { showMessage } from './message.js';
 import { initSocket, request } from './socket.js';
 
 const list = [
-    XHS,
     INS
 ];
 
@@ -27,6 +25,22 @@ const hideHelper = () => {
     }
 };
 
+const copyText = (text) => {
+    return new Promise((resolve) => {
+        let err;
+        try {
+            navigator.clipboard.writeText(text);
+        } catch (e) {
+            err = e;
+        }
+        if (err) {
+            resolve(false);
+        } else {
+            resolve(true);
+        }
+    });
+};
+
 const bindEvents = (item) => {
     // init events
 
@@ -38,7 +52,14 @@ const bindEvents = (item) => {
 
         const info = await item.getDownloadInfo();
         if (info) {
-            showMessage('Saving ...');
+
+            if (e.target.className === 'td-helper-open') {
+                copyText(item.filename);
+                window.open(info.url, '_blank');
+                return;
+            }
+
+            showMessage(`Saving ... ${info.url}`);
             saveAs(info.url, info.filename);
             showMessage('Saved');
         }
@@ -107,9 +128,15 @@ const initialize = () => {
     iconDownload.innerHTML = svgDownload;
     downloadHelper.appendChild(iconDownload);
 
-    const label = document.createElement('span');
-    label.innerHTML = 'save';
-    downloadHelper.appendChild(label);
+    const label1 = document.createElement('span');
+    label1.className = 'td-helper-open';
+    label1.innerHTML = 'Open';
+    downloadHelper.appendChild(label1);
+
+    const label2 = document.createElement('span');
+    label2.className = 'td-helper-save';
+    label2.innerHTML = 'Save';
+    downloadHelper.appendChild(label2);
 
     initSocket();
 

@@ -1,6 +1,5 @@
 # turbo-downloader
 
-- Xiaohongshu
 - Instagram
 
 ## Usage

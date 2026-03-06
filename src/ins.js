@@ -38,7 +38,7 @@ const getVideoInfo = async (options) => {
     }
 
     // const id = info.id;
-    // console.log(info);
+    console.log('video info', info);
 
     // single video
     if (info.video_versions) {
